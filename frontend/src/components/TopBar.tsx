@@ -156,7 +156,6 @@ function StatusLine({ progress, status }: { progress: QueueProgress; status?: St
           Provider: <strong>{status.active_provider ?? "none available"}</strong> ({status.provider_mode})
         </span>
       )}
-      {status?.switch_reason && <span className="text-amber-700">⚠ {status.switch_reason}</span>}
       {ffError && !status?.switch_reason && status?.active_provider === "fast_flights" && (
         <span className="text-amber-700" title={ffError}>
           ⚠ fast-flights: {ffError.length > 80 ? `${ffError.slice(0, 80)}…` : ffError}
