@@ -1,4 +1,4 @@
-# Aero
+# Aero Turkey Flight Finder
 
 <img src="frontend/public/favicon.svg" width="48" alt="Aero logo">
 
@@ -9,9 +9,14 @@ Aero is a web app that compares one-way economy flights between one internationa
 
 See [spec.md](spec.md) for the full specification.
 
+## Credits
+
+Turkey adaptation and deployment by [Ebad](https://github.com/ebad426623).
+This project is forked from [Aly Gilani's original Aero repository](https://github.com/AlyAsad/flight-data-aero).
+
 ## Live site
 
-**Live:** [aero-aly.vercel.app](https://aero-aly.vercel.app/)
+**Live:** [flight-data-aero.vercel.app](https://flight-data-aero.vercel.app/)
 
 Or run it on your own computer (below). Both work the same way.
 
@@ -33,8 +38,8 @@ Run `make help` to list every target.
 
 1. Choose a direction and type the foreign airport (name, city or IATA code).
 2. Pick a date. The view covers 3 days before to 3 days after it. Use ◂ ▸ to move a week at a time.
-3. The **sidebar** shows each city's cheapest fare that week. The **heatmap** shows the cheapest fare per city per day (green is cheap, red is expensive).
-4. Click a city or cell to load its **day tabs** and **flight list**. Click any column header to sort. Click a row to see layovers, flight numbers, aircraft, baggage and provider.
+3. The **sidebar** shows each Turkey airport group's cheapest fare that week. The **heatmap** shows the cheapest fare per airport and day (green is cheap, red is expensive).
+4. Click an airport or cell to load its **day tabs** and **flight list**. Click any column header to sort. Click a row to see layovers, flight numbers, aircraft, baggage and provider.
 
 Results fill in as they arrive: the page asks the server for each missing city-day in turn (a few at a time) and refreshes as they land. The status line shows progress ("Loading 23 of 77"), the active provider and any warnings. Hover a cell or tab to see when its data was fetched.
 
@@ -88,7 +93,7 @@ Switching provider mode applies from the next fetch, including the rest of a wee
 | `GOOGLE_CONSENT_COOKIE` | `true` | Send Google consent cookies with fast-flights requests |
 | `TURSO_DATABASE_URL` | (empty) | Turso database URL (`libsql://….turso.io`). Empty means the local file `data/flights.db`. Needed on Vercel. |
 | `TURSO_AUTH_TOKEN` | (empty) | Token for that Turso database |
-| `ADMIN_PASSWORD` | (empty) | If set, changing settings or cities, Refresh all cache and Clear cache need this password. Leave empty for local use. |
+| `ADMIN_PASSWORD` | (empty) | If set, changing settings or Turkey airports, Refresh all cache and Clear cache need this password. Leave empty for local use. |
 
 Turkey airport groups are defined in [backend/config/turkey_airports.json](backend/config/turkey_airports.json), and their `"enabled"` values are the defaults. Turn airports on or off in ⚙ settings; that choice is saved in the database and overrides the JSON. Edit the JSON (and restart) only to add an airport or change its IATA code.
 
@@ -112,7 +117,7 @@ backend/
   app/db.py              database backends: local SQLite file or Turso (HTTP)
   app/summary.py         week / day summaries from cache entries
   app/models.py          FlightOption, summaries, jobs, settings
-  config/uk_airports.json
+  config/turkey_airports.json
   scripts/smoke.py       live provider check (make smoke)
   tests/                 pytest suite; fixtures/ holds provider responses
 frontend/src/
@@ -128,8 +133,8 @@ data/                    local SQLite database (git-ignored)
 
 The unit of caching is a **route-day**: one Turkey airport, one foreign airport, one date, one direction. Work is done in **jobs** of one airport group on one date.
 
-1. The page asks `/api/week` for a view. The answer has the cached summary plus the jobs still needed, highest priority first: the selected city on the selected day, then its other days (nearest first), then every other city.
+1. The page asks `/api/week` for a view. The answer has the cached summary plus the jobs still needed, highest priority first: the selected airport on the selected day, then its other days (nearest first), then every other airport group.
 2. The browser runs those jobs through `/api/fetch`, a few at a time (`FETCH_CONCURRENCY`), waiting the delay the server suggests between requests. After each one it refreshes the week, so cells fill in as they land.
-3. Changing the week, city or day drops jobs that haven't started; running ones finish. A job isn't repeated within a view (failures are cached for 15 minutes), except by Refresh.
+3. Changing the week, airport or day drops jobs that haven't started; running ones finish. A job isn't repeated within a view (failures are cached for 15 minutes), except by Refresh.
 
 Every request is short, which is what lets the same code run on Vercel. Cached, unexpired data is never re-fetched unless you refresh, so reloading within the TTL makes no provider calls. A refresh ignores data fetched in the last 2 minutes, so mashing the button can't hammer Google; days that failed are always retried.
