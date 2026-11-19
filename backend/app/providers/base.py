@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Protocol, runtime_checkable
 
+from ..currency import convert_currency
 from ..models import Baggage, FlightOption, Layover
 
 
@@ -57,7 +58,9 @@ def build_flight_option(
     segments: list[Segment],
     *,
     provider: str,
-    price_gbp: float | None,
+    price_gbp: float | None = None,
+    price: float | None = None,
+    currency: str = "TRY",
     airlines: list[str] | None = None,
     total_duration: int | None = None,
     layover_overrides: list[dict] | None = None,
@@ -102,6 +105,24 @@ def build_flight_option(
     numbers = [s.flight_number for s in segments]
     aircraft = [s.aircraft for s in segments if s.aircraft]
 
+    # Handle prices and multi-currency conversion
+    p_try: float | None = None
+    p_pkr: float | None = None
+    p_gbp: float | None = price_gbp
+    raw_price: float | None = price
+
+    if price_gbp is not None:
+        p_gbp = price_gbp
+        p_try = convert_currency(price_gbp, "GBP", "TRY")
+        p_pkr = convert_currency(price_gbp, "GBP", "PKR")
+        if raw_price is None:
+            raw_price = p_try
+            currency = "TRY"
+    elif raw_price is not None:
+        p_try = convert_currency(raw_price, currency, "TRY")
+        p_pkr = convert_currency(raw_price, currency, "PKR")
+        p_gbp = convert_currency(raw_price, currency, "GBP")
+
     return FlightOption(
         id=stable_flight_id(segments),
         origin_airport=first.origin,
@@ -115,7 +136,11 @@ def build_flight_option(
         airlines=airlines,
         flight_numbers=numbers if all(numbers) else None,
         aircraft=aircraft or None,
-        price_gbp=price_gbp,
+        price_gbp=p_gbp,
+        price=raw_price,
+        currency=currency,
+        price_try=p_try,
+        price_pkr=p_pkr,
         baggage=baggage,
         is_self_transfer=is_self_transfer,
         provider=provider,

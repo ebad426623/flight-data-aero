@@ -13,8 +13,10 @@ from .config import parse_delay_range
 
 
 class Direction(StrEnum):
-    FROM_UK = "from_uk"
-    TO_UK = "to_uk"
+    FROM_TR = "from_tr"
+    TO_TR = "to_tr"
+    FROM_UK = "from_uk"  # backward compatibility
+    TO_UK = "to_uk"      # backward compatibility
 
 
 class ProviderMode(StrEnum):
@@ -77,6 +79,10 @@ class FlightOption(BaseModel):
     flight_numbers: list[str] | None = None
     aircraft: list[str] | None = None
     price_gbp: float | None = None
+    price: float | None = None
+    currency: str = "TRY"
+    price_try: float | None = None
+    price_pkr: float | None = None
     baggage: Baggage | None = None
     is_self_transfer: bool | None = None
     provider: str
@@ -100,6 +106,9 @@ class RouteDaySummary(BaseModel):
     group_id: str
     date: Date
     cheapest_price: float | None = None
+    cheapest_price_try: float | None = None
+    cheapest_price_pkr: float | None = None
+    cheapest_price_gbp: float | None = None
     cheapest_flight_id: str | None = None
     option_count: int = 0
     status: DayStatus
@@ -117,6 +126,9 @@ class GroupWeek(BaseModel):
     airports: list[str]
     days: list[RouteDaySummary]
     cheapest_price: float | None = None
+    cheapest_price_try: float | None = None
+    cheapest_price_pkr: float | None = None
+    cheapest_price_gbp: float | None = None
     status: DayStatus
 
 
@@ -148,6 +160,10 @@ class WeekSummary(BaseModel):
     pending_count: int
     min_price: float | None = None
     max_price: float | None = None
+    min_price_try: float | None = None
+    max_price_try: float | None = None
+    min_price_pkr: float | None = None
+    max_price_pkr: float | None = None
 
 
 class CacheMeta(BaseModel):

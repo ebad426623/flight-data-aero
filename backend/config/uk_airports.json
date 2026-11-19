@@ -1,12 +1,12 @@
 [
-  {"id": "LON", "name": "London", "airports": ["LHR", "LGW", "STN", "LTN"], "enabled": true},
-  {"id": "MAN", "name": "Manchester", "airports": ["MAN"], "enabled": true},
-  {"id": "BHX", "name": "Birmingham", "airports": ["BHX"], "enabled": true},
-  {"id": "EDI", "name": "Edinburgh", "airports": ["EDI"], "enabled": true},
-  {"id": "GLA", "name": "Glasgow", "airports": ["GLA"], "enabled": true},
-  {"id": "NCL", "name": "Newcastle", "airports": ["NCL"], "enabled": true},
-  {"id": "BRS", "name": "Bristol", "airports": ["BRS"], "enabled": true},
-  {"id": "LBA", "name": "Leeds Bradford", "airports": ["LBA"], "enabled": true},
-  {"id": "LPL", "name": "Liverpool", "airports": ["LPL"], "enabled": false},
-  {"id": "EMA", "name": "East Midlands", "airports": ["EMA"], "enabled": false}
+  {"id": "IST_ALL", "name": "Istanbul (All)", "airports": ["IST", "SAW"], "enabled": true},
+  {"id": "IST", "name": "Istanbul Airport (IST)", "airports": ["IST"], "enabled": true},
+  {"id": "SAW", "name": "Istanbul Sabiha (SAW)", "airports": ["SAW"], "enabled": true},
+  {"id": "ESB", "name": "Ankara (ESB)", "airports": ["ESB"], "enabled": true},
+  {"id": "AYT", "name": "Antalya (AYT)", "airports": ["AYT"], "enabled": false},
+  {"id": "ADB", "name": "Izmir (ADB)", "airports": ["ADB"], "enabled": false},
+  {"id": "BJV", "name": "Bodrum (BJV)", "airports": ["BJV"], "enabled": false},
+  {"id": "DLM", "name": "Dalaman (DLM)", "airports": ["DLM"], "enabled": false},
+  {"id": "TZX", "name": "Trabzon (TZX)", "airports": ["TZX"], "enabled": false},
+  {"id": "ADA", "name": "Adana (ADA)", "airports": ["ADA"], "enabled": false}
 ]

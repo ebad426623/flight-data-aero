@@ -76,7 +76,8 @@ def _map_itinerary(item: list[Any]) -> FlightOption:
     return build_flight_option(
         segments,
         provider=NAME,
-        price_gbp=float(price) if price else None,
+        price=float(price) if price else None,
+        currency="TRY",
         airlines=list(flight[1]) or None,
     )
 
@@ -95,7 +96,7 @@ def map_payload(payload: list[Any]) -> list[FlightOption]:
                 log.warning("skipping malformed Google Flights itinerary: %s", exc)
                 continue
             prev = options.get(option.id)
-            if prev is None or (option.price_gbp or 1e12) < (prev.price_gbp or 1e12):
+            if prev is None or (option.price_try or 1e12) < (prev.price_try or 1e12):
                 options[option.id] = option
     return list(options.values())
 
@@ -145,7 +146,7 @@ class FastFlightsProvider:
             trip="one-way",
             seat="economy",
             language="en-GB",
-            currency="GBP",
+            currency="TRY",
         )
         # Same client settings as fast_flights.fetch_flights_html, plus consent cookies.
         client = Client(
@@ -153,7 +154,7 @@ class FastFlightsProvider:
         )
         res = client.get(
             GOOGLE_FLIGHTS_URL,
-            params={**query.params(), "gl": "uk"},
+            params={**query.params(), "gl": "tr"},
             cookies=CONSENT_COOKIES if self._send_consent_cookie else None,
         )
         if res.status_code >= 400:

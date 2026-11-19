@@ -1,13 +1,13 @@
 """Fetch planning and execution, driven one job at a time by the browser.
 
-A *job* is one group-day (a UK city group on one date). `/api/week` returns the
+A *job* is one group-day (a Turkey airport group on one date). `/api/week` returns the
 jobs a week view still needs, in priority order; the browser then calls
 `/api/fetch` for each (a few at a time), so every server request is short.
 That suits serverless hosts like Vercel, and works the same locally.
 
 How a job is satisfied depends on the active provider:
 
-* fast-flights: one request per UK airport that still needs data (full).
+* fast-flights: one request per Turkey airport that still needs data (full).
 * SerpApi, selected city ("detail"): one multi-airport request for the group (full).
 * SerpApi, other cities ("overview"): one request for the whole batch the group
   belongs to (partial); that single request satisfies every group in the batch.
@@ -65,9 +65,10 @@ TIER_SELECTED_WEEK = 1
 TIER_OTHER_GROUPS = 2
 
 
-def route_endpoints(direction: Direction, uk: str, foreign: str) -> tuple[str, str]:
+def route_endpoints(direction: Direction, turkey: str, foreign: str) -> tuple[str, str]:
     """(origin, destination) for a query."""
-    return (uk, foreign) if direction is Direction.FROM_UK else (foreign, uk)
+    is_from = direction in (Direction.FROM_TR, Direction.FROM_UK)
+    return (turkey, foreign) if is_from else (foreign, turkey)
 
 
 def needs_fetch(
@@ -82,7 +83,7 @@ def needs_fetch(
         return True
     # A refresh always retries a failed fetch, and re-fetches data older than
     # MIN_FORCE_AGE_SECONDS (so mashing Refresh can't hammer Google).
-    if force_after is not None and (entry.in_error_backoff(now) or entry.fetched_at < force_after):
+    if force_after is not None and (entry.in_error_backoff(now) or entry.fetched_at <= force_after):
         return True
     if entry.in_error_backoff(now):
         return False
@@ -365,7 +366,7 @@ class Fetcher:
         """Fetch one group-day. Safe to call repeatedly: finished work is skipped."""
         group = next((g for g in self.groups if g.id == job.group), None)
         if group is None:
-            return self._result("error", f"unknown or disabled UK group: {job.group}")
+            return self._result("error", f"unknown or disabled Turkey airport group: {job.group}")
         if not is_fetchable(job.date):
             return self._result("skipped")
         force_after = utcnow() - timedelta(seconds=MIN_FORCE_AGE_SECONDS) if job.force else None
@@ -515,8 +516,9 @@ class Fetcher:
     ) -> dict[str, list[FlightOption]]:
         out: dict[str, list[FlightOption]] = {}
         for f in flights:
-            uk = f.origin_airport if direction is Direction.FROM_UK else f.destination_airport
-            out.setdefault(uk, []).append(f)
+            is_from = direction in (Direction.FROM_TR, Direction.FROM_UK)
+            turkey_airport = f.origin_airport if is_from else f.destination_airport
+            out.setdefault(turkey_airport, []).append(f)
         return out
 
     def _store(

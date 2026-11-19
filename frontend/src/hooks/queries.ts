@@ -2,8 +2,8 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { api, type ViewParams } from "../lib/api";
 import { WHOLE_WEEK } from "../lib/urlState";
 
-export function useUkGroups() {
-  return useQuery({ queryKey: ["uk-groups"], queryFn: api.ukGroups, staleTime: Infinity });
+export function useTurkeyGroups() {
+  return useQuery({ queryKey: ["groups"], queryFn: api.groups, staleTime: Infinity });
 }
 
 export function useWeek(view: ViewParams, group: string | null, day: string) {
@@ -33,8 +33,8 @@ export function useWeekFlights(view: ViewParams, group: string | null, enabled: 
   });
 }
 
-export function useAllUkGroups(enabled: boolean) {
-  return useQuery({ queryKey: ["uk-groups", "all"], queryFn: api.allUkGroups, enabled });
+export function useAllTurkeyGroups(enabled: boolean) {
+  return useQuery({ queryKey: ["groups", "all"], queryFn: api.allGroups, enabled });
 }
 
 export function useStatus() {

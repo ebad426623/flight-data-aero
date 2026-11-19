@@ -4,7 +4,7 @@ import { useDayFlights, useWeekFlights } from "../hooks/queries";
 import type { ViewParams } from "../lib/api";
 import { api } from "../lib/api";
 import { expiresIn, formatStamp, PARTIAL_TOOLTIP } from "../lib/format";
-import type { CacheMeta, Direction, FetchJob, GroupWeek } from "../lib/types";
+import type { CacheMeta, Currency, Direction, FetchJob, GroupWeek } from "../lib/types";
 import { type SortDir, WHOLE_WEEK } from "../lib/urlState";
 import { DayTabs } from "./DayTabs";
 import { FlightTable } from "./FlightTable";
@@ -14,6 +14,7 @@ interface Props {
   view: ViewParams;
   group: GroupWeek;
   foreignLabel: string;
+  currency: Currency;
   day: string;
   sort: { id: string; dir: SortDir };
   onDay: (day: string) => void;
@@ -84,10 +85,10 @@ function weekMeta(days: { meta: CacheMeta }[]): CacheMeta | undefined {
 }
 
 export function routeTitle(direction: Direction, groupName: string, foreignLabel: string): string {
-  return direction === "from_uk" ? `${groupName} → ${foreignLabel}` : `${foreignLabel} → ${groupName}`;
+  return direction === "from_tr" ? `${groupName} → ${foreignLabel}` : `${foreignLabel} → ${groupName}`;
 }
 
-export function FlightPanel({ view, group, foreignLabel, day, sort, onDay, onSort, onRefreshJobs }: Props) {
+export function FlightPanel({ view, group, foreignLabel, currency, day, sort, onDay, onSort, onRefreshJobs }: Props) {
   const isWeek = day === WHOLE_WEEK;
   const dayQ = useDayFlights(view, group.group_id, day);
   const weekQ = useWeekFlights(view, group.group_id, isWeek);
@@ -111,7 +112,7 @@ export function FlightPanel({ view, group, foreignLabel, day, sort, onDay, onSor
         <h2 className="text-lg font-semibold">{routeTitle(view.direction, group.name, foreignLabel)}</h2>
       </div>
       <div className="px-4">
-        <DayTabs days={group.days} selected={day} onSelect={onDay} />
+        <DayTabs days={group.days} selected={day} onSelect={onDay} currency={currency} />
       </div>
       <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-sm text-slate-600">
         {meta ? <MetaLine meta={meta} /> : <span />}
@@ -139,7 +140,7 @@ export function FlightPanel({ view, group, foreignLabel, day, sort, onDay, onSor
           <p className="p-6 text-sm text-rose-600">Failed to load flights: {error.message}</p>
         ) : flights.length > 0 ? (
           <div className="rounded-md border border-slate-200 bg-white">
-            <FlightTable flights={flights} direction={view.direction} showDate={isWeek} sort={sort} onSort={onSort} />
+            <FlightTable flights={flights} direction={view.direction} currency={currency} showDate={isWeek} sort={sort} onSort={onSort} />
           </div>
         ) : (
           <EmptyState meta={meta} />

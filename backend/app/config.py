@@ -15,7 +15,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 BACKEND_DIR = Path(__file__).resolve().parent.parent
 REPO_ROOT = BACKEND_DIR.parent
 DATA_DIR = REPO_ROOT / "data"
-UK_AIRPORTS_CONFIG = BACKEND_DIR / "config" / "uk_airports.json"
+TURKEY_AIRPORTS_CONFIG = BACKEND_DIR / "config" / "turkey_airports.json"
+UK_AIRPORTS_CONFIG = TURKEY_AIRPORTS_CONFIG if TURKEY_AIRPORTS_CONFIG.exists() else BACKEND_DIR / "config" / "uk_airports.json"
 # Vite builds the frontend here; FastAPI serves it (Vercel moves these files to its CDN).
 FRONTEND_DIST = REPO_ROOT / "frontend" / "dist"
 

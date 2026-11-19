@@ -32,7 +32,7 @@ class AppState:
 
     @property
     def groups(self) -> tuple[UKGroup, ...]:
-        """Currently enabled UK groups (read from the database each time)."""
+        """Currently enabled Turkey airport groups (read from the database each time)."""
         return self.group_store.enabled()
 
     @classmethod

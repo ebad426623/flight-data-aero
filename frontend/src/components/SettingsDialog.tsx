@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { useAllUkGroups, useSettings, useStatus } from "../hooks/queries";
+import { useAllTurkeyGroups, useSettings, useStatus } from "../hooks/queries";
 import { setAdminPassword, useAdminPassword } from "../lib/admin";
 import { api, ApiError } from "../lib/api";
 import type { AppSettings, ProviderMode } from "../lib/types";
@@ -119,7 +119,7 @@ export function SettingsDialog({ open, onClose, onExpireAll, onClearCache }: Pro
   const { data: status } = useStatus();
   const [draft, setDraft] = useState<AppSettings | null>(null);
   const [delayMs, setDelayMs] = useState<[number, number]>([500, 1000]);
-  const { data: allGroups } = useAllUkGroups(open);
+  const { data: allGroups } = useAllTurkeyGroups(open);
   const [enabledGroups, setEnabledGroups] = useState<Set<string>>(new Set());
   const adminPassword = useAdminPassword();
   const protectedSite = status?.admin_protected ?? false;
@@ -144,7 +144,7 @@ export function SettingsDialog({ open, onClose, onExpireAll, onClearCache }: Pro
   }, [open, allGroups]);
 
   const delayError = validateDelayMs(delayMs[0], delayMs[1]);
-  const groupsError = enabledGroups.size === 0 ? "Enable at least one UK city." : null;
+  const groupsError = enabledGroups.size === 0 ? "Enable at least one Turkey airport." : null;
   const groupsChanged =
     !!allGroups && allGroups.some((g) => g.enabled !== enabledGroups.has(g.id));
 
@@ -152,7 +152,7 @@ export function SettingsDialog({ open, onClose, onExpireAll, onClearCache }: Pro
     mutationFn: async (s: AppSettings) => {
       const saved = await api.putSettings({ ...s, delay_seconds: [delayMs[0] / 1000, delayMs[1] / 1000] });
       if (groupsChanged && allGroups) {
-        await api.setUkGroups(allGroups.filter((g) => enabledGroups.has(g.id)).map((g) => g.id));
+        await api.setGroups(allGroups.filter((g) => enabledGroups.has(g.id)).map((g) => g.id));
       }
       return saved;
     },
@@ -161,7 +161,7 @@ export function SettingsDialog({ open, onClose, onExpireAll, onClearCache }: Pro
     },
     onSuccess: (s) => {
       qc.setQueryData(["settings"], s);
-      void qc.invalidateQueries({ queryKey: ["uk-groups"] });
+      void qc.invalidateQueries({ queryKey: ["groups"] });
       void qc.invalidateQueries({ queryKey: ["status"] });
       void qc.invalidateQueries({ queryKey: ["week"] }); // expiry times / cities may have changed
       void qc.invalidateQueries({ queryKey: ["flights"] });
@@ -296,7 +296,7 @@ export function SettingsDialog({ open, onClose, onExpireAll, onClearCache }: Pro
           </div>
 
           <fieldset>
-            <legend className="text-sm font-medium">UK cities</legend>
+            <legend className="text-sm font-medium">Turkey airports</legend>
             <div className="mt-1 grid grid-cols-2 gap-x-4 gap-y-1">
               {allGroups?.map((g) => (
                 <label key={g.id} className="flex items-start gap-2 text-sm">

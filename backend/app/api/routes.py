@@ -11,7 +11,7 @@ import asyncio
 import hmac
 from datetime import date as Date
 from datetime import datetime, timedelta
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query
 
@@ -65,7 +65,7 @@ Admin = Depends(require_admin)
 def _group(state: AppState, group_id: str) -> UKGroup:
     group = next((g for g in state.groups if g.id == group_id), None)
     if group is None:
-        raise HTTPException(404, f"unknown or disabled UK group: {group_id}")
+        raise HTTPException(404, f"unknown or disabled Turkey airport group: {group_id}")
     return group
 
 
@@ -88,17 +88,27 @@ async def _maybe_sync_serpapi_usage(state: AppState) -> None:
 # ---------------------------------------------------------------------- lookups
 
 
+@router.get("/rates")
+def rates() -> dict[str, Any]:
+    from ..currency import CURRENCY_SYMBOLS, get_exchange_rates
+    return {
+        "base": "TRY",
+        "rates": get_exchange_rates(),
+        "symbols": CURRENCY_SYMBOLS,
+    }
+
+
 @router.get("/airports")
 def airports(q: Annotated[str, Query(min_length=1, max_length=64)]) -> list[Airport]:
     return search_airports(q)
 
 
-@router.get("/uk-groups")
+@router.get("/groups")
 def uk_groups(state: State, include_disabled: bool = False) -> list[UKGroup]:
     return state.group_store.all() if include_disabled else list(state.groups)
 
 
-@router.put("/uk-groups", dependencies=[Admin])
+@router.put("/groups", dependencies=[Admin])
 def set_uk_groups(state: State, body: UKGroupsUpdate) -> list[UKGroup]:
     """Enable exactly the given groups (all others are disabled)."""
     try:

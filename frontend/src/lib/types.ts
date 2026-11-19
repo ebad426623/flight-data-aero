@@ -1,6 +1,7 @@
 // Mirrors backend/app/models.py. Dates are "YYYY-MM-DD"; datetimes are ISO strings.
 
-export type Direction = "from_uk" | "to_uk";
+export type Direction = "from_tr" | "to_tr";
+export type Currency = "TRY" | "PKR" | "BOTH";
 export type ProviderMode = "auto" | "fast_flights" | "serpapi";
 export type DayStatus = "ok" | "empty" | "error" | "pending" | "past" | "not_on_sale";
 export type BagStatus = "included" | "fee" | "unknown";
@@ -32,23 +33,31 @@ export interface FlightOption {
   flight_numbers: string[] | null;
   aircraft: string[] | null;
   price_gbp: number | null;
+  price?: number | null;
+  currency?: string;
+  price_try?: number | null;
+  price_pkr?: number | null;
   baggage: Baggage | null;
   is_self_transfer: boolean | null;
   provider: string;
   fetched_at: string | null;
 }
 
-export interface UKGroup {
+export interface TurkeyGroup {
   id: string;
   name: string;
   airports: string[];
   enabled: boolean;
 }
 
+
 export interface RouteDaySummary {
   group_id: string;
   date: string;
   cheapest_price: number | null;
+  cheapest_price_try?: number | null;
+  cheapest_price_pkr?: number | null;
+  cheapest_price_gbp?: number | null;
   cheapest_flight_id: string | null;
   option_count: number;
   status: DayStatus;
@@ -66,6 +75,9 @@ export interface GroupWeek {
   airports: string[];
   days: RouteDaySummary[];
   cheapest_price: number | null;
+  cheapest_price_try?: number | null;
+  cheapest_price_pkr?: number | null;
+  cheapest_price_gbp?: number | null;
   status: DayStatus;
 }
 
@@ -96,6 +108,10 @@ export interface WeekSummary {
   pending_count: number;
   min_price: number | null;
   max_price: number | null;
+  min_price_try?: number | null;
+  max_price_try?: number | null;
+  min_price_pkr?: number | null;
+  max_price_pkr?: number | null;
 }
 
 export interface CacheMeta {

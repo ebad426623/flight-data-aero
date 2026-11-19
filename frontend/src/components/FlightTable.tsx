@@ -8,14 +8,15 @@ import {
 } from "@tanstack/react-table";
 import { Fragment, useMemo, useState } from "react";
 import { dayMonthLabel, weekdayLabel } from "../lib/dates";
-import { BAG_LABEL, formatDuration, formatPrice, formatStamp, localDate, localTime } from "../lib/format";
-import type { BagStatus, Direction, FlightOption } from "../lib/types";
+import { BAG_LABEL, formatDuration, formatPrice, formatStamp, getPrice, getSecondaryPrice, localDate, localTime } from "../lib/format";
+import type { BagStatus, Currency, Direction, FlightOption } from "../lib/types";
 import type { SortDir } from "../lib/urlState";
 import { computeHighlights } from "./flightHighlights";
 
 interface Props {
   flights: FlightOption[];
   direction: Direction;
+  currency?: Currency;
   showDate: boolean;
   sort: { id: string; dir: SortDir };
   onSort: (s: { id: string; dir: SortDir }) => void;
@@ -44,13 +45,13 @@ function BagIcons({ f }: { f: FlightOption }) {
 
 const dash = <span className="text-slate-400">—</span>;
 
-function buildColumns(direction: Direction, showDate: boolean): ColumnDef<FlightOption>[] {
-  const ukAirport = (f: FlightOption) => (direction === "from_uk" ? f.origin_airport : f.destination_airport);
+function buildColumns(direction: Direction, currency: Currency, showDate: boolean): ColumnDef<FlightOption>[] {
+  const turkeyAirport = (f: FlightOption) => (direction === "from_tr" ? f.origin_airport : f.destination_airport);
   const cols: ColumnDef<FlightOption>[] = [
     {
-      id: "uk_airport",
-      header: "UK airport",
-      accessorFn: ukAirport,
+      id: "turkey_airport",
+      header: "Turkey airport",
+      accessorFn: turkeyAirport,
       cell: (c) => <span className="font-mono">{c.getValue<string>()}</span>,
     },
     {
@@ -106,9 +107,9 @@ function buildColumns(direction: Direction, showDate: boolean): ColumnDef<Flight
     {
       id: "price",
       header: "Price",
-      accessorFn: (f) => f.price_gbp ?? undefined,
+      accessorFn: (f) => getPrice(f, currency) ?? undefined,
       sortUndefined: "last",
-      cell: (c) => <span className="font-semibold tabular-nums">{formatPrice(c.row.original.price_gbp)}</span>,
+      cell: (c) => <span className="font-semibold tabular-nums">{formatPrice(getPrice(c.row.original, currency), false, currency, getSecondaryPrice(c.row.original))}</span>,
     },
     {
       id: "bags",
@@ -187,9 +188,9 @@ function FlightDetails({ f }: { f: FlightOption }) {
   );
 }
 
-export function FlightTable({ flights, direction, showDate, sort, onSort }: Props) {
+export function FlightTable({ flights, direction, currency = "TRY", showDate, sort, onSort }: Props) {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
-  const columns = useMemo(() => buildColumns(direction, showDate), [direction, showDate]);
+  const columns = useMemo(() => buildColumns(direction, currency, showDate), [direction, currency, showDate]);
   const highlights = useMemo(() => computeHighlights(flights), [flights]);
   // Must be referentially stable: a new array each render makes the sorted row
   // model recompute every render, which (with TanStack's auto-reset of table

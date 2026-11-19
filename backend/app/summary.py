@@ -22,7 +22,14 @@ from .models import (
 
 
 def _sort_flights(flights: list[FlightOption]) -> list[FlightOption]:
-    return sorted(flights, key=lambda f: (f.price_gbp is None, f.price_gbp or 0, f.departure_local))
+    return sorted(
+        flights,
+        key=lambda f: (
+            f.price_try is None and f.price_gbp is None,
+            f.price_try if f.price_try is not None else (f.price_gbp or 0),
+            f.departure_local,
+        ),
+    )
 
 
 def combine_entries(
@@ -69,12 +76,24 @@ def combine_entries(
 def _day_summary(
     group: UKGroup, day: date, flights: list[FlightOption], meta: CacheMeta, queued: bool
 ) -> RouteDaySummary:
-    priced = [f for f in flights if f.price_gbp is not None]
-    cheapest = min(priced, key=lambda f: f.price_gbp or 0, default=None)
+    priced = [f for f in flights if f.price_try is not None or f.price_gbp is not None]
+    cheapest = min(
+        priced,
+        key=lambda f: f.price_try if f.price_try is not None else (f.price_gbp or 0),
+        default=None,
+    )
+    ch_price = (
+        cheapest.price_try
+        if (cheapest and cheapest.price_try is not None)
+        else (cheapest.price_gbp if cheapest else None)
+    )
     return RouteDaySummary(
         group_id=group.id,
         date=day,
-        cheapest_price=cheapest.price_gbp if cheapest else None,
+        cheapest_price=ch_price,
+        cheapest_price_try=cheapest.price_try if cheapest else None,
+        cheapest_price_pkr=cheapest.price_pkr if cheapest else None,
+        cheapest_price_gbp=cheapest.price_gbp if cheapest else None,
         cheapest_flight_id=cheapest.id if cheapest else None,
         option_count=len(flights),
         status=meta.status,
@@ -153,6 +172,15 @@ class SummaryBuilder:
                 )
             ]
             prices = [d.cheapest_price for d in summaries if d.cheapest_price is not None]
+            prices_try = [
+                d.cheapest_price_try for d in summaries if d.cheapest_price_try is not None
+            ]
+            prices_pkr = [
+                d.cheapest_price_pkr for d in summaries if d.cheapest_price_pkr is not None
+            ]
+            prices_gbp = [
+                d.cheapest_price_gbp for d in summaries if d.cheapest_price_gbp is not None
+            ]
             group_weeks.append(
                 GroupWeek(
                     group_id=group.id,
@@ -160,11 +188,20 @@ class SummaryBuilder:
                     airports=group.airports,
                     days=summaries,
                     cheapest_price=min(prices, default=None),
+                    cheapest_price_try=min(prices_try, default=None),
+                    cheapest_price_pkr=min(prices_pkr, default=None),
+                    cheapest_price_gbp=min(prices_gbp, default=None),
                     status=_group_status(summaries),
                 )
             )
         all_prices = [
             d.cheapest_price for g in group_weeks for d in g.days if d.cheapest_price is not None
+        ]
+        all_prices_try = [
+            d.cheapest_price_try for g in group_weeks for d in g.days if d.cheapest_price_try is not None
+        ]
+        all_prices_pkr = [
+            d.cheapest_price_pkr for g in group_weeks for d in g.days if d.cheapest_price_pkr is not None
         ]
         pending = len(jobs)
         return WeekSummary(
@@ -177,4 +214,8 @@ class SummaryBuilder:
             pending_count=pending,
             min_price=min(all_prices, default=None),
             max_price=max(all_prices, default=None),
+            min_price_try=min(all_prices_try, default=None),
+            max_price_try=max(all_prices_try, default=None),
+            min_price_pkr=min(all_prices_pkr, default=None),
+            max_price_pkr=max(all_prices_pkr, default=None),
         )

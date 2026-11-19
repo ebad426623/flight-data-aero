@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { addDays, isValidISODate, todayISO } from "./dates";
-import type { Direction } from "./types";
+import type { Currency, Direction } from "./types";
 
 export type SortDir = "asc" | "desc";
 export type CitySort = "price" | "alpha";
@@ -14,6 +14,7 @@ export interface ViewState {
   day: string;
   sort: { id: string; dir: SortDir };
   citySort: CitySort;
+  currency: Currency;
 }
 
 export const DEFAULT_FOREIGN = "KHI";
@@ -33,8 +34,15 @@ export function parseState(search: string, now = new Date()): ViewState {
   const dayParam = p.get("day");
   const day = dayParam === WHOLE_WEEK || isValidISODate(dayParam) ? dayParam! : center;
   const [sortId, sortDir] = (p.get("sort") ?? "").split(":");
+  const dirParam = p.get("dir");
+  const direction: Direction = dirParam === "to_tr" ? "to_tr" : "from_tr";
+
+  const currParam = (p.get("curr") ?? "").toUpperCase();
+  const currency: Currency =
+    currParam === "PKR" || currParam === "BOTH" ? (currParam as Currency) : "TRY";
+
   return {
-    direction: p.get("dir") === "to_uk" ? "to_uk" : "from_uk",
+    direction,
     foreign,
     center,
     group: p.get("group") || null,
@@ -44,6 +52,7 @@ export function parseState(search: string, now = new Date()): ViewState {
         ? { id: sortId, dir: sortDir }
         : DEFAULT_SORT,
     citySort: p.get("cities") === "alpha" ? "alpha" : "price",
+    currency,
   };
 }
 
@@ -57,6 +66,7 @@ export function serializeState(s: ViewState): string {
   if (s.sort.id !== DEFAULT_SORT.id || s.sort.dir !== DEFAULT_SORT.dir)
     p.set("sort", `${s.sort.id}:${s.sort.dir}`);
   if (s.citySort !== "price") p.set("cities", s.citySort);
+  if (s.currency && s.currency !== "TRY") p.set("curr", s.currency);
   return p.toString();
 }
 

@@ -30,8 +30,8 @@ export function Footer() {
   return (
     <footer className="mt-auto flex flex-col items-center gap-2 border-t border-slate-200 px-4 pt-8 pb-8 text-sm text-slate-500">
       <p className="max-w-xl text-center text-xs text-slate-500">
-        Flight search sites compare one city to another. Aero shows every major UK city side by side across the whole
-        week, so you can see which airport and day work out best before you book.
+        Compare flights to and from Turkey across Istanbul Airport, Sabiha Gökçen, Ankara and more, then choose the
+        airport and day that work best before you book.
       </p>
       <div className="flex items-center gap-1">
         <IconLink href={GITHUB_URL} label="GitHub" path={GITHUB_PATH} />

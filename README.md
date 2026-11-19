@@ -2,10 +2,10 @@
 
 <img src="frontend/public/favicon.svg" width="48" alt="Aero logo">
 
-Aero is a web app that compares one-way economy flights between one international airport and eight UK city groups, a week at a time, so you can pick the cheapest or most convenient UK airport. It shows data only. It does not book or link to booking sites.
+Aero is a web app that compares one-way economy flights between one international airport and Turkey's major airports, a week at a time, so you can pick the cheapest or most convenient Turkish airport. It shows data only. It does not book or link to booking sites.
 
-- **From UK**: every enabled UK city → one destination (e.g. → Karachi KHI)
-- **To UK**: one origin → every enabled UK city
+- **From Turkey**: every enabled Turkish airport → one destination (e.g. Istanbul → Karachi KHI)
+- **To Turkey**: one origin → every enabled Turkish airport
 
 See [spec.md](spec.md) for the full specification.
 
@@ -46,13 +46,13 @@ Results fill in as they arrive: the page asks the server for each missing city-d
 | hatched cell | Date is in the past, or not yet on sale (more than ~330 days out) |
 
 **⟳ Refresh week** (top bar) re-fetches the week shown. **Cache** (in ⚙ settings, admin only on a protected site): Refresh all cache (marks everything expired, then re-fetches the view) and Clear cache.
-**⚙ settings**: provider mode, SerpApi cap and usage, concurrency, request delay (in ms, minimum 1) and which UK cities to include. Cache expiry is server configuration only (`CACHE_TTL_DAYS`). Enabling or disabling a city updates the sidebar and heatmap straight away.
+**⚙ settings**: provider mode, SerpApi cap and usage, concurrency, request delay (in ms, minimum 1) and which Turkey airports to include. Cache expiry is server configuration only (`CACHE_TTL_DAYS`). Enabling or disabling an airport updates the sidebar and heatmap straight away.
 
 ## Data providers
 
 | Provider | Cost | Notes |
 | --- | --- | --- |
-| [fast-flights](https://github.com/AWeirdDev/fast-flights) 3.1.0 (default) | Free | Unofficial Google Flights scraper, one request per UK airport per day. Includes flight numbers. No baggage or self-transfer info. |
+| [fast-flights](https://github.com/AWeirdDev/fast-flights) 3.1.0 (default) | Free | Unofficial Google Flights scraper, one request per Turkey airport per day. Includes flight numbers. No baggage or self-transfer info. |
 | [SerpApi](https://serpapi.com/google-flights-api) (optional) | 250 searches/month free | Richer data. Searches a whole city group in one request. Usage is tracked and never exceeds the cap (default 230). |
 
 Provider modes:
@@ -90,7 +90,7 @@ Switching provider mode applies from the next fetch, including the rest of a wee
 | `TURSO_AUTH_TOKEN` | (empty) | Token for that Turso database |
 | `ADMIN_PASSWORD` | (empty) | If set, changing settings or cities, Refresh all cache and Clear cache need this password. Leave empty for local use. |
 
-UK city groups and their airports are defined in [backend/config/uk_airports.json](backend/config/uk_airports.json), and its `"enabled"` values are the defaults. Turn cities on or off in ⚙ settings; that choice is saved in the database and overrides the JSON. Edit the JSON (and restart) only to add a city or change its airports. Liverpool and East Midlands are off by default.
+Turkey airport groups are defined in [backend/config/turkey_airports.json](backend/config/turkey_airports.json), and their `"enabled"` values are the defaults. Turn airports on or off in ⚙ settings; that choice is saved in the database and overrides the JSON. Edit the JSON (and restart) only to add an airport or change its IATA code.
 
 
 ## Development
@@ -126,7 +126,7 @@ data/                    local SQLite database (git-ignored)
 
 ### How fetching works
 
-The unit of caching is a **route-day**: one UK airport, one foreign airport, one date, one direction. Work is done in **jobs** of one city-day (all of a city's airports on one date).
+The unit of caching is a **route-day**: one Turkey airport, one foreign airport, one date, one direction. Work is done in **jobs** of one airport group on one date.
 
 1. The page asks `/api/week` for a view. The answer has the cached summary plus the jobs still needed, highest priority first: the selected city on the selected day, then its other days (nearest first), then every other city.
 2. The browser runs those jobs through `/api/fetch`, a few at a time (`FETCH_CONCURRENCY`), waiting the delay the server suggests between requests. After each one it refreshes the week, so cells fill in as they land.

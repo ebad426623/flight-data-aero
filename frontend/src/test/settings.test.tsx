@@ -66,7 +66,7 @@ describe("SettingsDialog", () => {
         if (url.includes("status")) {
           return new Response(JSON.stringify({ ...status, admin_protected: adminProtected }), { status: 200 });
         }
-        const data = url.includes("uk-groups")
+        const data = url.includes("/groups")
           ? groups
           : url.includes("status")
             ? status
@@ -95,10 +95,10 @@ describe("SettingsDialog", () => {
     fireEvent.click(await screen.findByLabelText(/Liverpool/));
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
-    await waitFor(() => expect(calls.some((c) => c.url.endsWith("/uk-groups"))).toBe(true));
+    await waitFor(() => expect(calls.some((c) => c.url.endsWith("/groups"))).toBe(true));
     const put = calls.find((c) => c.url.endsWith("/settings") && c.method === "PUT");
     expect((put?.body as { delay_seconds: number[] }).delay_seconds).toEqual([0.1, 0.3]);
-    const groupsPut = calls.find((c) => c.url.endsWith("/uk-groups") && c.method === "PUT");
+    const groupsPut = calls.find((c) => c.url.endsWith("/groups") && c.method === "PUT");
     expect(groupsPut?.body).toEqual({ enabled: ["LON", "LPL"] });
   });
 
@@ -110,7 +110,7 @@ describe("SettingsDialog", () => {
 
     fireEvent.change(screen.getByLabelText("Minimum delay (ms)"), { target: { value: "500" } });
     fireEvent.click(await screen.findByLabelText(/London/));
-    expect(screen.getByText(/at least one UK city/)).toBeInTheDocument();
+    expect(screen.getByText(/at least one Turkey airport/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Save" })).toBeDisabled();
   });
 

@@ -55,7 +55,7 @@ export function group(id: string, name: string, price: number | null, days?: Rou
 export function week(groups: GroupWeek[], dates = ["2026-12-31"]): WeekSummary {
   const prices = groups.flatMap((g) => g.days.map((d) => d.cheapest_price)).filter((p): p is number => p != null);
   return {
-    direction: "from_uk",
+    direction: "from_tr",
     foreign: "KHI",
     center_date: dates[0]!,
     dates,

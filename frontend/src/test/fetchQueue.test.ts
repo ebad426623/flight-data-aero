@@ -3,7 +3,7 @@ import { FetchQueue, jobKey } from "../lib/fetchQueue";
 import type { FetchJob, FetchResult, QueueProgress } from "../lib/types";
 
 const job = (group: string, date = "2026-12-31", extra: Partial<FetchJob> = {}): FetchJob => ({
-  direction: "from_uk",
+  direction: "from_tr",
   foreign: "KHI",
   group,
   date,
@@ -141,6 +141,6 @@ describe("FetchQueue", () => {
   });
 
   it("keys jobs by route and date", () => {
-    expect(jobKey(job("NCL"))).toBe("from_uk:KHI:NCL:2026-12-31");
+    expect(jobKey(job("IST"))).toBe("from_tr:KHI:IST:2026-12-31");
   });
 });

@@ -6,7 +6,7 @@ import type {
   FetchResult,
   FlightsResponse,
   Status,
-  UKGroup,
+  TurkeyGroup,
   WeekFlightsResponse,
   WeekSummary,
 } from "./types";
@@ -57,10 +57,10 @@ export interface ViewParams {
 
 export const api = {
   airports: (q: string) => request<Airport[]>(`/airports?${qs({ q })}`),
-  ukGroups: () => request<UKGroup[]>("/uk-groups"),
-  allUkGroups: () => request<UKGroup[]>("/uk-groups?include_disabled=true"),
-  setUkGroups: (enabled: string[]) =>
-    request<UKGroup[]>("/uk-groups", { method: "PUT", body: JSON.stringify({ enabled }) }),
+  groups: () => request<TurkeyGroup[]>("/groups"),
+  allGroups: () => request<TurkeyGroup[]>("/groups?include_disabled=true"),
+  setGroups: (enabled: string[]) =>
+    request<TurkeyGroup[]>("/groups", { method: "PUT", body: JSON.stringify({ enabled }) }),
   week: (v: ViewParams, selectedGroup?: string, selectedDate?: string) =>
     request<WeekSummary>(
       `/week?${qs({

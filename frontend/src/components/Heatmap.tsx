@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { dayMonthLabel, weekdayLabel } from "../lib/dates";
-import { formatPrice } from "../lib/format";
+import { formatPrice, getPrice, getSecondaryPrice } from "../lib/format";
 import { priceColor } from "../lib/heatmap";
-import type { RouteDaySummary, WeekSummary } from "../lib/types";
+import type { Currency, RouteDaySummary, WeekSummary } from "../lib/types";
 import { cellTooltip } from "./cellTooltip";
 import { Spinner } from "./Spinner";
 
@@ -11,6 +11,7 @@ interface Props {
   selectedGroup: string | null;
   selectedDay: string;
   onSelect: (groupId: string, day: string) => void;
+  currency?: Currency;
 }
 
 const COLLAPSE_KEY = "heatmap-collapsed";
@@ -23,11 +24,12 @@ function readCollapsed(): boolean {
   }
 }
 
-function CellContent({ d }: { d: RouteDaySummary }) {
-  if (d.cheapest_price != null) {
+function CellContent({ d, currency }: { d: RouteDaySummary; currency: Currency }) {
+  const price = getPrice(d, currency);
+  if (price != null) {
     return (
       <span className="flex items-center justify-center gap-1">
-        <span className="tabular-nums">{formatPrice(d.cheapest_price, d.is_partial)}</span>
+        <span className="tabular-nums">{formatPrice(price, d.is_partial, currency, getSecondaryPrice(d))}</span>
         {d.loading && <Spinner className="h-2 w-2" />}
       </span>
     );
@@ -56,7 +58,7 @@ function cellClass(d: RouteDaySummary): string {
   return `${base} ${d.is_stale ? "border border-dashed border-slate-500 opacity-70" : ""}`;
 }
 
-export function Heatmap({ week, selectedGroup, selectedDay, onSelect }: Props) {
+export function Heatmap({ week, selectedGroup, selectedDay, onSelect, currency = "TRY" }: Props) {
   const [collapsed, setCollapsed] = useState(readCollapsed);
   const toggle = () => {
     setCollapsed((c) => {
@@ -73,7 +75,7 @@ export function Heatmap({ week, selectedGroup, selectedDay, onSelect }: Props) {
     <section className="border-b border-slate-200 bg-white px-4 py-2">
       <div className="flex items-center justify-between">
         <h2 className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
-          Heatmap · cheapest per city and day
+          Heatmap · cheapest per airport and day
         </h2>
         <button
           type="button"
@@ -121,7 +123,7 @@ export function Heatmap({ week, selectedGroup, selectedDay, onSelect }: Props) {
                           }}
                           className={`${cellClass(d)} ${selected ? "ring-2 ring-sky-600" : ""}`}
                         >
-                          <CellContent d={d} />
+                          <CellContent d={d} currency={currency} />
                         </button>
                       </td>
                     );

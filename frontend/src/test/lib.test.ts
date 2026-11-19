@@ -31,10 +31,10 @@ describe("dates", () => {
 
 describe("format", () => {
   it("formats prices", () => {
-    expect(formatPrice(410)).toBe("£410");
-    expect(formatPrice(410.4, true)).toBe("£410*");
+    expect(formatPrice(410)).toBe("₺410");
+    expect(formatPrice(410.4, true)).toBe("₺410*");
     expect(formatPrice(null)).toBe("—");
-    expect(formatPrice(1234)).toBe("£1,234");
+    expect(formatPrice(1234)).toBe("₺1,234");
   });
   it("formats durations", () => {
     expect(formatDuration(670)).toBe("11h 10m");
@@ -72,16 +72,16 @@ describe("url state", () => {
     expect(s.center).toBe("2026-11-27");
     expect(s.day).toBe("2026-11-27");
     expect(s.foreign).toBe(DEFAULT_FOREIGN);
-    expect(s.direction).toBe("from_uk");
+    expect(s.direction).toBe("from_tr");
     expect(s.sort).toEqual({ id: "price", dir: "asc" });
   });
   it("round-trips through the query string", () => {
-    const s = parseState("dir=to_uk&foreign=dxb&date=2026-12-31&group=MAN&day=week&sort=duration:desc&cities=alpha", now);
+    const s = parseState("dir=to_tr&foreign=dxb&date=2026-12-31&group=IST&day=week&sort=duration:desc&cities=alpha", now);
     expect(s).toMatchObject({
-      direction: "to_uk",
+      direction: "to_tr",
       foreign: "DXB",
       center: "2026-12-31",
-      group: "MAN",
+      group: "IST",
       day: "week",
       sort: { id: "duration", dir: "desc" },
       citySort: "alpha",
@@ -90,7 +90,7 @@ describe("url state", () => {
   });
   it("ignores invalid values", () => {
     const s = parseState("dir=sideways&foreign=TOOLONG&date=nope&sort=x:y", now);
-    expect(s.direction).toBe("from_uk");
+    expect(s.direction).toBe("from_tr");
     expect(s.foreign).toBe("KHI");
     expect(s.center).toBe("2026-11-27");
     expect(s.sort).toEqual({ id: "price", dir: "asc" });

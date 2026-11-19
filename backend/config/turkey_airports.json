@@ -1,0 +1,12 @@
+[
+  {"id": "IST_ALL", "name": "Istanbul (All)", "airports": ["IST", "SAW"], "enabled": true},
+  {"id": "IST", "name": "Istanbul Airport (IST)", "airports": ["IST"], "enabled": true},
+  {"id": "SAW", "name": "Istanbul Sabiha (SAW)", "airports": ["SAW"], "enabled": true},
+  {"id": "ESB", "name": "Ankara (ESB)", "airports": ["ESB"], "enabled": true},
+  {"id": "AYT", "name": "Antalya (AYT)", "airports": ["AYT"], "enabled": false},
+  {"id": "ADB", "name": "Izmir (ADB)", "airports": ["ADB"], "enabled": false},
+  {"id": "BJV", "name": "Bodrum (BJV)", "airports": ["BJV"], "enabled": false},
+  {"id": "DLM", "name": "Dalaman (DLM)", "airports": ["DLM"], "enabled": false},
+  {"id": "TZX", "name": "Trabzon (TZX)", "airports": ["TZX"], "enabled": false},
+  {"id": "ADA", "name": "Adana (ADA)", "airports": ["ADA"], "enabled": false}
+]

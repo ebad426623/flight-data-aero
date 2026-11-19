@@ -1,8 +1,61 @@
-import type { BagStatus } from "./types";
+import type { BagStatus, Currency } from "./types";
 
-export function formatPrice(p: number | null | undefined, partial = false): string {
+export const TRY_TO_PKR_APPROX = 5.5;
+
+export interface PriceHolder {
+  cheapest_price?: number | null;
+  cheapest_price_try?: number | null;
+  cheapest_price_pkr?: number | null;
+  cheapest_price_gbp?: number | null;
+  price?: number | null;
+  price_try?: number | null;
+  price_pkr?: number | null;
+  price_gbp?: number | null;
+}
+
+export function getPrice(item: PriceHolder | null | undefined, currency: Currency): number | null {
+  if (!item) return null;
+  if (currency === "PKR") {
+    if (item.price_pkr != null) return item.price_pkr;
+    if (item.cheapest_price_pkr != null) return item.cheapest_price_pkr;
+    const base = item.cheapest_price ?? item.price;
+    return base != null ? base * TRY_TO_PKR_APPROX : null;
+  }
+  if (item.price_try != null) return item.price_try;
+  if (item.cheapest_price_try != null) return item.cheapest_price_try;
+  return item.cheapest_price ?? item.price ?? item.price_gbp ?? null;
+}
+
+export function getSecondaryPrice(item: PriceHolder | null | undefined): number | null {
+  if (!item) return null;
+  if (item.price_pkr != null) return item.price_pkr;
+  if (item.cheapest_price_pkr != null) return item.cheapest_price_pkr;
+  const base = item.cheapest_price_try ?? item.cheapest_price ?? item.price;
+  return base != null ? base * TRY_TO_PKR_APPROX : null;
+}
+
+export function formatPrice(
+  p: number | null | undefined,
+  partial = false,
+  currency: Currency | "GBP" = "TRY",
+  secondary?: number | null,
+): string {
   if (p == null) return "—";
-  return `£${Math.round(p).toLocaleString("en-GB")}${partial ? "*" : ""}`;
+  const num = Math.round(p).toLocaleString("en-GB");
+  const star = partial ? "*" : "";
+
+  if (currency === "PKR") {
+    return `₨${num}${star}`;
+  }
+  if (currency === "GBP") {
+    return `£${num}${star}`;
+  }
+  if (currency === "BOTH") {
+    const sec = secondary != null ? secondary : p * TRY_TO_PKR_APPROX;
+    const secNum = Math.round(sec).toLocaleString("en-GB");
+    return `₺${num} (₨${secNum})${star}`;
+  }
+  return `₺${num}${star}`;
 }
 
 export function formatDuration(minutes: number | null | undefined): string {

@@ -1,6 +1,6 @@
 import { dayMonthLabel, weekdayLabel } from "../lib/dates";
-import { formatPrice } from "../lib/format";
-import type { RouteDaySummary } from "../lib/types";
+import { formatPrice, getPrice, getSecondaryPrice } from "../lib/format";
+import type { Currency, RouteDaySummary } from "../lib/types";
 import { WHOLE_WEEK } from "../lib/urlState";
 import { cellTooltip } from "./cellTooltip";
 import { Spinner } from "./Spinner";
@@ -9,10 +9,12 @@ interface Props {
   days: RouteDaySummary[];
   selected: string;
   onSelect: (day: string) => void;
+  currency?: Currency;
 }
 
-function Subheading({ d }: { d: RouteDaySummary }) {
-  if (d.cheapest_price != null) return <>{formatPrice(d.cheapest_price, d.is_partial)}</>;
+function Subheading({ d, currency }: { d: RouteDaySummary; currency: Currency }) {
+  const price = getPrice(d, currency);
+  if (price != null) return <>{formatPrice(price, d.is_partial, currency, getSecondaryPrice(d))}</>;
   if (d.status === "pending" || d.loading) return <Spinner />;
   if (d.status === "error") return <span className="text-amber-600">⚠</span>;
   if (d.status === "past") return <>past</>;
@@ -20,7 +22,7 @@ function Subheading({ d }: { d: RouteDaySummary }) {
   return <>—</>;
 }
 
-export function DayTabs({ days, selected, onSelect }: Props) {
+export function DayTabs({ days, selected, onSelect, currency = "TRY" }: Props) {
   const tab = (key: string, active: boolean, children: React.ReactNode, title?: string) => (
     <button
       key={key}
@@ -48,7 +50,7 @@ export function DayTabs({ days, selected, onSelect }: Props) {
               {weekdayLabel(d.date)} {dayMonthLabel(d.date)}
             </span>
             <span className={`block text-xs tabular-nums ${d.is_stale ? "text-slate-400" : "text-slate-500"}`}>
-              <Subheading d={d} />
+              <Subheading d={d} currency={currency} />
             </span>
           </>,
           cellTooltip(d),

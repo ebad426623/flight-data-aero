@@ -29,7 +29,7 @@ describe("CitySidebar", () => {
         onSelect={onSelect}
       />,
     );
-    expect(screen.getByText("£388")).toBeInTheDocument();
+    expect(screen.getByText("₺388")).toBeInTheDocument();
     expect(screen.getByText("—")).toBeInTheDocument();
     fireEvent.click(screen.getByText("Bristol"));
     expect(onSelect).toHaveBeenCalledWith("BRS");
@@ -60,10 +60,10 @@ describe("Heatmap", () => {
       day({ date: dates[3], cheapest_price: null, status: "not_on_sale" }),
     ];
     render(<Heatmap week={week([group("NCL", "Newcastle", 400, days)], dates)} selectedGroup="NCL" selectedDay={dates[0]!} onSelect={onSelect} />);
-    expect(screen.getByText("£400*")).toBeInTheDocument();
+    expect(screen.getByText("₺400*")).toBeInTheDocument();
     expect(screen.getByText("⚠")).toBeInTheDocument();
     expect(screen.getByText("not on sale").closest("button")).toBeDisabled();
-    fireEvent.click(screen.getByText("£400*"));
+    fireEvent.click(screen.getByText("₺400*"));
     expect(onSelect).toHaveBeenCalledWith("NCL", dates[0]);
   });
 });
@@ -90,13 +90,13 @@ describe("FlightTable", () => {
     screen.getAllByRole("row").slice(1).map((r) => within(r).getAllByRole("cell")[0]!.textContent);
 
   it("sorts by the given column with nulls last", () => {
-    render(<FlightTable flights={flights} direction="from_uk" showDate={false} sort={{ id: "price", dir: "asc" }} onSort={() => {}} />);
+    render(<FlightTable flights={flights} direction="from_tr" showDate={false} sort={{ id: "price", dir: "asc" }} onSort={() => {}} />);
     expect(airportsInOrder()).toEqual(["STN", "LHR", "LGW"]);
   });
 
   it("reports header clicks as sort changes", () => {
     const onSort = vi.fn();
-    render(<FlightTable flights={flights} direction="from_uk" showDate={false} sort={{ id: "price", dir: "asc" }} onSort={onSort} />);
+    render(<FlightTable flights={flights} direction="from_tr" showDate={false} sort={{ id: "price", dir: "asc" }} onSort={onSort} />);
     fireEvent.click(screen.getByRole("button", { name: /Duration/ }));
     expect(onSort).toHaveBeenCalledWith({ id: "duration", dir: "asc" });
     fireEvent.click(screen.getByRole("button", { name: /Price/ }));
@@ -104,14 +104,14 @@ describe("FlightTable", () => {
   });
 
   it("expands a row to show details with dashes for missing fields", () => {
-    render(<FlightTable flights={flights} direction="from_uk" showDate={false} sort={{ id: "price", dir: "asc" }} onSort={() => {}} />);
+    render(<FlightTable flights={flights} direction="from_tr" showDate={false} sort={{ id: "price", dir: "asc" }} onSort={() => {}} />);
     fireEvent.click(screen.getAllByText("STN")[0]!);
     expect(screen.getByText("PC 1")).toBeInTheDocument();
     expect(screen.getByText("Self-transfer").nextSibling?.textContent).toBe("—");
   });
 
   it("shows the date column on the whole-week tab and +1 arrivals", () => {
-    render(<FlightTable flights={flights} direction="from_uk" showDate sort={{ id: "price", dir: "asc" }} onSort={() => {}} />);
+    render(<FlightTable flights={flights} direction="from_tr" showDate sort={{ id: "price", dir: "asc" }} onSort={() => {}} />);
     expect(screen.getByRole("button", { name: /Date/ })).toBeInTheDocument();
     expect(screen.getAllByText("+1")).toHaveLength(3);
   });
@@ -141,7 +141,7 @@ describe("FlightTable render stability", () => {
       const [fl, setFl] = useState([tripwireFlight("a")]);
       setFlights = setFl;
       // A fresh sort object every render, as App passes it from URL state.
-      return <FlightTable flights={fl} direction="from_uk" showDate={false} sort={{ id: "price", dir: "asc" }} onSort={() => {}} />;
+      return <FlightTable flights={fl} direction="from_tr" showDate={false} sort={{ id: "price", dir: "asc" }} onSort={() => {}} />;
     }
     render(<Parent />);
     for (let i = 0; i < 3; i++) {

@@ -78,11 +78,13 @@ export default function App() {
     <div className="flex h-full flex-col">
       <TopBar
         direction={state.direction}
+        currency={state.currency}
         foreign={state.foreign}
         center={state.center}
         progress={progress}
         status={status}
         onDirection={(direction) => update({ direction })}
+        onCurrency={(currency) => update({ currency })}
         onForeign={(foreign) => update({ foreign })}
         onCenter={(center) => update({ center })}
         onRefreshWeek={() => refreshWeek.mutate()}
@@ -101,12 +103,14 @@ export default function App() {
             groups={week.data.groups}
             selected={state.group}
             sort={state.citySort}
+            currency={state.currency}
             onSort={(citySort) => update({ citySort })}
             onSelect={(group) => update({ group })}
           />
           <main className="flex min-h-0 flex-1 flex-col overflow-auto">
             <Heatmap
               week={week.data}
+                currency={state.currency}
               selectedGroup={state.group}
               selectedDay={state.day}
               onSelect={(group, day) => update({ group, day })}
@@ -116,6 +120,7 @@ export default function App() {
                 view={view}
                 group={selectedGroup}
                 foreignLabel={foreignLabel}
+                currency={state.currency}
                 day={state.day}
                 sort={state.sort}
                 onDay={(day) => update({ day })}

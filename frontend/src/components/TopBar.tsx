@@ -1,17 +1,19 @@
 import { useAirportSearch } from "../hooks/queries";
 import { addDays, rangeLabel, weekDates } from "../lib/dates";
-import type { Direction, QueueProgress, Status } from "../lib/types";
+import type { Currency, Direction, QueueProgress, Status } from "../lib/types";
 import { AirportPicker, airportLabel } from "./AirportPicker";
 import { Brand } from "./Logo";
 import { Spinner } from "./Spinner";
 
 interface Props {
   direction: Direction;
+  currency: Currency;
   foreign: string;
   center: string;
   progress: QueueProgress;
   status: Status | undefined;
   onDirection: (d: Direction) => void;
+  onCurrency: (c: Currency) => void;
   onForeign: (iata: string) => void;
   onCenter: (date: string) => void;
   onRefreshWeek: () => void;
@@ -19,12 +21,13 @@ interface Props {
 }
 
 export function TopBar(props: Props) {
-  const { direction, foreign, center } = props;
+  const { direction, currency, foreign, center } = props;
   const { data: current } = useAirportSearch(foreign);
   const place = airportLabel(
     current?.find((a) => a.iata === foreign),
     foreign,
   );
+  const isFromTurkey = direction === "from_tr";
 
   return (
     <header className="border-b border-slate-200 bg-white px-4 py-2">
@@ -35,15 +38,42 @@ export function TopBar(props: Props) {
           aria-label="Direction"
           className="inline-flex overflow-hidden rounded-md border border-slate-300 text-sm"
         >
-          {(["from_uk", "to_uk"] as const).map((d) => (
+          <button
+            type="button"
+            aria-pressed={isFromTurkey}
+            onClick={() => props.onDirection("from_tr")}
+            className={`px-3 py-1 font-medium ${isFromTurkey ? "bg-sky-600 text-white" : "bg-white hover:bg-slate-50 text-slate-700"}`}
+          >
+            From Turkey ▸
+          </button>
+          <button
+            type="button"
+            aria-pressed={!isFromTurkey}
+            onClick={() => props.onDirection("to_tr")}
+            className={`px-3 py-1 font-medium ${!isFromTurkey ? "bg-sky-600 text-white" : "bg-white hover:bg-slate-50 text-slate-700"}`}
+          >
+            ◂ To Turkey
+          </button>
+        </div>
+
+        {/* Currency Options: TL (TRY) and PKR */}
+        <div
+          role="group"
+          aria-label="Currency option"
+          className="inline-flex overflow-hidden rounded-md border border-slate-300 text-sm"
+        >
+          {(["TRY", "PKR", "BOTH"] as const).map((c) => (
             <button
-              key={d}
+              key={c}
               type="button"
-              aria-pressed={direction === d}
-              onClick={() => props.onDirection(d)}
-              className={`px-3 py-1 ${direction === d ? "bg-sky-600 text-white" : "bg-white hover:bg-slate-50"}`}
+              aria-pressed={currency === c}
+              onClick={() => props.onCurrency(c)}
+              title={c === "TRY" ? "Turkish Lira (₺)" : c === "PKR" ? "Pakistani Rupee (₨)" : "Show both TL and PKR"}
+              className={`px-2.5 py-1 text-xs font-semibold ${
+                currency === c ? "bg-emerald-600 text-white" : "bg-white text-slate-700 hover:bg-slate-50"
+              }`}
             >
-              {d === "from_uk" ? "From UK ▸" : "◂ To UK"}
+              {c === "TRY" ? "TL (₺)" : c === "PKR" ? "PKR (₨)" : "Both"}
             </button>
           ))}
         </div>
@@ -51,7 +81,7 @@ export function TopBar(props: Props) {
         <AirportPicker value={foreign} onChange={props.onForeign} />
 
         <span className="text-sm text-slate-500">
-          {direction === "from_uk" ? `From UK to ${place}` : `From ${place} to UK`}
+          {isFromTurkey ? `From Turkey to ${place}` : `From ${place} to Turkey`}
         </span>
 
         <div className="flex items-center gap-1">
