@@ -1,6 +1,8 @@
-const GITHUB_URL = "https://github.com/AlyAsad";
+const ALY_GITHUB_URL = "https://github.com/AlyAsad";
+const EBAD_GITHUB_URL = "https://github.com/ebad426623";
 const REPO_URL = "https://github.com/AlyAsad/flight-data-aero";
-const LINKEDIN_URL = "https://www.linkedin.com/in/alyasad/";
+const ALY_LINKEDIN_URL = "https://www.linkedin.com/in/alyasad/";
+const EBAD_LINKEDIN_URL = "https://www.linkedin.com/in/syedebadhyder/";
 
 // Simple Icons paths (CC0).
 const GITHUB_PATH =
@@ -33,10 +35,26 @@ export function Footer() {
         Compare flights to and from Turkey across Istanbul Airport, Sabiha Gökçen, Ankara and more, then choose the
         airport and day that work best before you book.
       </p>
-      <div className="flex items-center gap-1">
-        <IconLink href={GITHUB_URL} label="GitHub" path={GITHUB_PATH} />
-        <IconLink href={LINKEDIN_URL} label="LinkedIn" path={LINKEDIN_PATH} />
-      </div>
+      <section className="flex flex-col items-center gap-1">
+        <p className="font-medium text-slate-600">Turkey edition and deployment by Ebad</p>
+        <div className="flex items-center gap-1">
+          <IconLink href={EBAD_GITHUB_URL} label="Ebad on GitHub" path={GITHUB_PATH} />
+          <IconLink href={EBAD_LINKEDIN_URL} label="Ebad on LinkedIn" path={LINKEDIN_PATH} />
+        </div>
+      </section>
+      <section className="flex flex-col items-center gap-1 border-t border-slate-200 pt-3">
+        <p className="text-xs text-slate-500">
+          Forked from Aly Gilani's original{" "}
+          <a href={REPO_URL} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-slate-700">
+            Aero repository
+          </a>
+          .
+        </p>
+        <div className="flex items-center gap-1">
+          <IconLink href={ALY_GITHUB_URL} label="Aly on GitHub" path={GITHUB_PATH} />
+          <IconLink href={ALY_LINKEDIN_URL} label="Aly on LinkedIn" path={LINKEDIN_PATH} />
+        </div>
+      </section>
       <p>
         <span className="font-medium text-slate-600">Aero</span> · built by Aly Gilani
       </p>
